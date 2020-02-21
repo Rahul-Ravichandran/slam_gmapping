@@ -188,11 +188,11 @@ void SlamGMapping::init()
   if(!private_nh_.getParam("throttle_scans", throttle_scans_))
     throttle_scans_ = 1;
   if(!private_nh_.getParam("base_frame", base_frame_))
-    base_frame_ = "base_link";
+    base_frame_ = "summit_base_link";
   if(!private_nh_.getParam("map_frame", map_frame_))
     map_frame_ = "map";
   if(!private_nh_.getParam("odom_frame", odom_frame_))
-    odom_frame_ = "odom";
+    odom_frame_ = "odom_combined";
 
   private_nh_.param("transform_publish_period", transform_publish_period_, 0.05);
 
@@ -230,9 +230,9 @@ void SlamGMapping::init()
   if(!private_nh_.getParam("stt", stt_))
     stt_ = 0.2;
   if(!private_nh_.getParam("linearUpdate", linearUpdate_))
-    linearUpdate_ = 1.0;
+    linearUpdate_ = 0.0;
   if(!private_nh_.getParam("angularUpdate", angularUpdate_))
-    angularUpdate_ = 0.5;
+    angularUpdate_ = 0.0;
   if(!private_nh_.getParam("temporalUpdate", temporalUpdate_))
     temporalUpdate_ = -1.0;
   if(!private_nh_.getParam("resampleThreshold", resampleThreshold_))
@@ -272,7 +272,7 @@ void SlamGMapping::startLiveSlam()
   sst_ = node_.advertise<nav_msgs::OccupancyGrid>("map", 1, true);
   sstm_ = node_.advertise<nav_msgs::MapMetaData>("map_metadata", 1, true);
   ss_ = node_.advertiseService("dynamic_map", &SlamGMapping::mapCallback, this);
-  scan_filter_sub_ = new message_filters::Subscriber<sensor_msgs::LaserScan>(node_, "scan", 5);
+  scan_filter_sub_ = new message_filters::Subscriber<sensor_msgs::LaserScan>(node_, "scan_multi", 5);
   scan_filter_ = new tf::MessageFilter<sensor_msgs::LaserScan>(*scan_filter_sub_, tf_, odom_frame_, 5);
   scan_filter_->registerCallback(boost::bind(&SlamGMapping::laserCallback, this, _1));
 
